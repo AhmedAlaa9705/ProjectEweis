@@ -7,6 +7,9 @@ using System.Security.Claims;
 using System.Text;
 using TestApiJWT.Models;
 using Microsoft.Exchange.WebServices.Data;
+using Microsoft.AspNet.SignalR.Infrastructure;
+using ProjectEweis.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace ProjectEweis.Services
 {
@@ -17,12 +20,14 @@ namespace ProjectEweis.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly JWT _jwt;
+        
 
         public LoginSystem(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _jwt = jwt.Value;
+           
         }
 
         public async Task<AuthModel> RegisterAsync(RegisterModel model)
@@ -47,6 +52,7 @@ namespace ProjectEweis.Services
             if (!result.Succeeded)
             {
                 var errors = string.Empty;
+               
 
                 foreach (var error in result.Errors)
                     errors += $"{error.Description},";
@@ -115,7 +121,8 @@ namespace ProjectEweis.Services
             var userClaims = await _userManager.GetClaimsAsync(user);
             var roles = await _userManager.GetRolesAsync(user);
             var roleClaims = new List<Claim>();
-
+            
+          
             foreach (var role in roles)
                 roleClaims.Add(new Claim("roles", role));
 
@@ -124,6 +131,7 @@ namespace ProjectEweis.Services
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
+               // new Claim(JwtRegisteredClaimNames.UniqueName, user.Id),
                 new Claim("uid", user.Id)
             }
             .Union(userClaims)

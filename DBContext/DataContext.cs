@@ -17,6 +17,8 @@ namespace DAL.DBContext
            public DbSet<commercial> commercials { get; set; }
            public DbSet<real_estate_yes> real_estate_yess { get; set; }
            public DbSet<UserRequest> Requests { get; set; }
+           public DbSet<Message> Messages { get; set; }
+           public DbSet<Partnership_proposal> Partnership_Proposals { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
                 {
                     base.OnModelCreating(builder);

@@ -1,12 +1,20 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DAL.DBContext;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using ProjectEweis.Healper;
+using ProjectEweis.Hubs;
 using ProjectEweis.Models;
+using ProjectEweis.ModelView;
 using ProjectEweis.ModelView.POSTVM;
 using ProjectEweis.ModelView.RequestVM;
 using ProjectEweis.Services.POST;
 using ProjectEweis.Services.Request;
+using System.Security.Claims;
+using TestApiJWT.Models;
 
 namespace ProjectEweis.Controllers
 {
@@ -17,11 +25,17 @@ namespace ProjectEweis.Controllers
     {
         private readonly IPOST _POST;
         private readonly IRequest _Request;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ApplicationDbContext db;
+      //  private readonly IHubContext<ChatHub> _hubContext;
 
-        public HomeController(IPOST POST , IRequest Request)
+        public HomeController(IPOST POST , IRequest Request, UserManager<ApplicationUser> userManager, ApplicationDbContext _db)
         {
             _POST = POST;
             _Request = Request;
+            _userManager = userManager;
+            db = _db;
+          //  _hubContext = hubContext;
         }
 
         [HttpPost]
@@ -118,6 +132,43 @@ namespace ProjectEweis.Controllers
                 regions = JsonConvert.DeserializeObject<List<regions>>(json);
             }
             return Ok(regions);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMessages()
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            var messages = await db.Messages.ToListAsync();
+
+            return Ok(messages);
+        }
+        [HttpPost]
+        public async Task<IActionResult> SendMessages(MessageModel message)
+        {
+            if (ModelState.IsValid)
+            {
+                //message.UserName = User.Identity.Name;
+              //  var sender = await _userManager.GetUserAsync(User);
+                string userName = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                string email = User.FindFirst(ClaimTypes.Email)?.Value;
+                var userId = User.FindFirst("uid")?.Value;
+                //message.UserId=sender.Id;
+                Message message1 = new Message
+                {
+                    UserName = userName,
+                    When = DateTime.Now,
+                    Text = message.Text,
+                    UserId = userId,
+                    Email=email
+
+                };
+                await db.Messages.AddAsync(message1);
+                await db.SaveChangesAsync();
+                return Ok();
+            }
+
+            return BadRequest();
         }
 
     }

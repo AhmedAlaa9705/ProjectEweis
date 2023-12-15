@@ -12,6 +12,9 @@ using TestApiJWT.Models;
 using ProjectEweis.Models;
 using ProjectEweis.Services.POST;
 using ProjectEweis.Services.Request;
+using ProjectEweis.Hubs;
+using Microsoft.AspNet.SignalR;
+using IRequest = ProjectEweis.Services.Request.IRequest;
 
 namespace ProjectEweis
 {
@@ -35,7 +38,8 @@ namespace ProjectEweis
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
             //////////////////Console.WriteLine("rrrrrr");////////////////////////////
-
+            ///
+            builder.Services.AddSignalR();
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -72,9 +76,10 @@ namespace ProjectEweis
                .AllowAnyMethod()
                .AllowAnyHeader();
             });
+          
 
             app.UseHttpsRedirection();
-            
+            app.MapHub<ChatHub>("/Home/GetMessages");
             app.UseAuthentication();
             app.UseAuthorization();
 

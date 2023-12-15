@@ -1,5 +1,6 @@
 ﻿using ProjectEweis.Migrations;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using TestApiJWT.Models;
 
 
@@ -164,5 +165,16 @@ namespace ProjectEweis.Models
         public int Deleted { get; set; }=0;
 
         public List<UserRequest> requests { get; set; }
+    }
+
+    public class Partnership_proposal
+    {
+        public int Id { get; set; }
+        public bool Islocation_suitable { get; set; }
+        public bool Ispartnership_amount_appropriate { get; set; }
+        public double? Amount { get; set; }
+        public string UserId { get; set; }
+        [ForeignKey("UserId")]
+        public ApplicationUser User { get; set; }
     }
 }
