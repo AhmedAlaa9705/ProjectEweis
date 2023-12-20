@@ -30,7 +30,18 @@ namespace ProjectEweis
             builder.Services.AddScoped<ILoginSystem, LoginSystem>();
             builder.Services.AddScoped<IPOST, POST>();
             builder.Services.AddScoped<IRequest, Request>();
-
+           
+            //builder.Services.AddCors(a => a.AddPolicy(
+            //  name: "AllowOrigin",
+            //  builder => {
+            //      builder
+            //      .AllowAnyOrigin()
+            //      .AllowAnyMethod()
+            //       .AllowCredentials()
+            //      .AllowAnyHeader()
+            //      .WithOrigins("https://localhost:44327/");
+            //      }
+            //  ));
             builder.Services.AddEndpointsApiExplorer();
           
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -69,17 +80,21 @@ namespace ProjectEweis
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseCors(builder =>
-            {
-                builder
-               .AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
-            });
-          
+            //app.UseCors(builder =>
+            //{
+            //    builder
+            //   .AllowAnyOrigin()
+            //   .AllowAnyMethod()
+            //   .AllowAnyHeader();
+            //});
+            app.UseCors(x => x
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .SetIsOriginAllowed(origin => true) // allow any origin
+        .AllowCredentials()); // allow credentials
 
             app.UseHttpsRedirection();
-            app.MapHub<ChatHub>("/Home/GetMessages");
+            app.MapHub<ChatHub>("/chathub");
             app.UseAuthentication();
             app.UseAuthorization();
 

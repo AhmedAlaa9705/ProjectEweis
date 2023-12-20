@@ -1,6 +1,7 @@
 ﻿using ProjectEweis.Services;
 using Microsoft.AspNetCore.Mvc;
 using TestApiJWT.Models;
+using ProjectEweis.ModelView.POSTVM;
 
 namespace ProjectEweis.Controllers
 {
@@ -41,6 +42,20 @@ namespace ProjectEweis.Controllers
                 return BadRequest(result.Message);
 
             return Ok(result);
+        }
+
+        [HttpPost("UpdateUser")]
+        public async Task<IActionResult> UpdateUser(UpdateUser model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _LoginSystem.UpdateUser(model);
+
+            if (!string.IsNullOrEmpty(result))
+                return BadRequest(result);
+
+            return Ok(new {message="تم التعديل"});
         }
 
         [HttpPost("addrole")]

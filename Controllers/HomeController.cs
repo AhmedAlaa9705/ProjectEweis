@@ -18,7 +18,7 @@ using TestApiJWT.Models;
 
 namespace ProjectEweis.Controllers
 {
-    [Authorize]
+   // [Authorize]
     [Route("[controller]/[action]")]
     [ApiController]
     public class HomeController : ControllerBase

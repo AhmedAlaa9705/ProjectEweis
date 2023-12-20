@@ -6,24 +6,24 @@ namespace ProjectEweis.Hubs
 {
     public class ChatHub:Hub
     {
-        public override Task OnConnectedAsync()
+        
+        public async Task SendMessage(string user ,string message)
         {
-            Groups.AddToGroupAsync(Context.ConnectionId, Context.User.Identity.Name);
-            return base.OnConnectedAsync();
-        }
-        public async Task SendMessage(Message message)
-        {
-            await Clients.All.SendAsync("ReceiveMessage", message);
+            await Clients.All.SendAsync("ReceiveMessage",user, message);
         }
 
         public async Task SendToUser(string user, string receiverConnectionId, string message)
         {
             await Clients.Client(receiverConnectionId).SendAsync("ReceiveMessage", user, message);
         }
-
-        public Task SendMessageToGroup(string receiver, string message)
+        public  Task GetUser(string userId)
         {
-            return Clients.Group(receiver).SendAsync("ReceiveMessage", message);
+           return Groups.AddToGroupAsync(Context.ConnectionId,userId);
+        }
+
+        public Task SendMessageToGroup(string receiver,string sender, string message)
+        {
+            return Clients.Group(receiver).SendAsync("ReceiveMessage",sender, message);
         }
 
         public string GetConnectionId()

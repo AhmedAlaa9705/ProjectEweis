@@ -10,24 +10,25 @@ using Microsoft.Exchange.WebServices.Data;
 using Microsoft.AspNet.SignalR.Infrastructure;
 using ProjectEweis.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using ProjectEweis.ModelView.POSTVM;
 
 namespace ProjectEweis.Services
 {
-    
+
 
     public class LoginSystem : ILoginSystem
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly JWT _jwt;
-        
+
 
         public LoginSystem(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _jwt = jwt.Value;
-           
+
         }
 
         public async Task<AuthModel> RegisterAsync(RegisterModel model)
@@ -52,7 +53,7 @@ namespace ProjectEweis.Services
             if (!result.Succeeded)
             {
                 var errors = string.Empty;
-               
+
 
                 foreach (var error in result.Errors)
                     errors += $"{error.Description},";
@@ -115,14 +116,28 @@ namespace ProjectEweis.Services
 
             return result.Succeeded ? string.Empty : "Sonething went wrong";
         }
+        public async Task<string> UpdateUser(UpdateUser model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user != null)
+                user.Name = model.Name;
+                user.PhoneNumber = model.PhoneNumber;
+              var result = await _userManager.UpdateAsync(user);
+            return result.Succeeded ? string.Empty : "Sonething went wrong";
+
+
+
+
+
+        }
 
         private async Task<JwtSecurityToken> CreateJwtToken(ApplicationUser user)
         {
             var userClaims = await _userManager.GetClaimsAsync(user);
             var roles = await _userManager.GetRolesAsync(user);
             var roleClaims = new List<Claim>();
-            
-          
+
+
             foreach (var role in roles)
                 roleClaims.Add(new Claim("roles", role));
 

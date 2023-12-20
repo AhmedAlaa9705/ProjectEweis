@@ -7,7 +7,7 @@ using ProjectEweis.ModelView.POSTVM;
 
 namespace ProjectEweis.Controllers
 {
-    [Authorize]
+   // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PartnershipProposalController : ControllerBase
